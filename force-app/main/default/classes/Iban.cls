@@ -11,7 +11,7 @@ public class Iban {
         4. Interpret the string as a decimal integer and compute the remainder of that number on division by 97
     */
     public static Boolean validate(String iban) { 
-        iban = iban.trim();
+        iban = iban.deleteWhiteSpace().trim();
         
         if (iban.length() < IBAN_MIN_SIZE || iban.length() > IBAN_MAX_SIZE)
             return false;

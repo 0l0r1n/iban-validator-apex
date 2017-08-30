@@ -26,10 +26,9 @@ public class Iban {
         Iban_Format__mdt ibanFormat = ibanFormats[0];
         if (ibanFormat.Characters__c != iban.length())
             return false;
-        System.debug(iban.substring(4));
-        System.debug(iban.substring(0, 4));
+        
         iban = iban.substring(4) + iban.substring(0, 4);
-        System.debug(iban);
+        
         String ibanNumber = convertCharsToNumbers(iban);
         Integer remainer = 0;
         while (ibanNumber.length() >= 7) {

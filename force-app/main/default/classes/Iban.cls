@@ -17,6 +17,7 @@ public class Iban {
             return false;
 
         iban = iban.capitalize();
+        
         String countryCode = iban.substring(0, 2);
         List<Iban_Format__mdt> ibanFormats = IbanFormatRepository.getByNationalBankCodes(new Set<String> { countryCode });
         if (ibanFormats.size() == 0)
@@ -25,21 +26,29 @@ public class Iban {
         Iban_Format__mdt ibanFormat = ibanFormats[0];
         if (ibanFormat.Characters__c != iban.length())
             return false;
-
+        System.debug(iban.substring(4));
+        System.debug(iban.substring(0, 4));
         iban = iban.substring(4) + iban.substring(0, 4);
-        Integer ibanAsInt = convertToNumber(iban);
-        
-        return Math.mod(ibanAsInt, MAGIC_NUMBER) == 1; 
+        System.debug(iban);
+        String ibanNumber = convertCharsToNumbers(iban);
+        Integer remainer = 0;
+        while (ibanNumber.length() >= 7) {
+            remainer = Math.mod(Integer.valueOf(remainer + ibanNumber.substring(0, 7)), 97);
+            ibanNumber = ibanNumber.substring(7);
+        }
+        remainer = Math.mod(Integer.valueOf(remainer + ibanNumber), 97);
+        return remainer == 1;
     }
 
-    private static Integer convertToNumber(String iban) {
+    private static String convertCharsToNumbers(String iban) {
         final Integer diff = 55; // used specific for the iban calculation. The char diff between the hashcode and iban is 55.
         String temp = '';
-        for (Integer i = 0; i < iban.length() - 1; i++){
+        for (Integer i = 0; i < iban.length(); i++){
             String character = iban.substring(i, i + 1);
-            temp += character.isNumeric() ? String.valueOf(character.hashCode() - diff) : character;
-        }   
-        return Integer.valueOf(temp);
+            temp += !character.isNumeric() ? String.valueOf(character.hashCode() - diff) : character;
+        }
+        System.debug(temp);
+        return temp;
     }
 
     public class CountryCodeNotConfiguredException extends Exception {}

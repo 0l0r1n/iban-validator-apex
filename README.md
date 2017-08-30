@@ -1,14 +1,5 @@
-# SFDX  App
+# IBAN Validator for Apex
 
-## Dev, Build and Test
+### Usage
 
-
-## Resources
-
-
-## Description of Files and Directories
-
-
-## Issues
-
-
+    Iban.validate('some iban') // returns a boolean indicating if the iban value is correct

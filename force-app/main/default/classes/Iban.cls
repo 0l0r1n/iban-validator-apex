@@ -18,26 +18,28 @@ public class Iban {
 
         iban = iban.capitalize();
         String countryCode = iban.substring(0, 2);
-        Iban_Format__mdt ibanFormat = IbanFormatRepository.getByNationalBankCodes(new Set<String> { countryCode })[0];
-        if (ibanFormat == null)
+        List<Iban_Format__mdt> ibanFormats = IbanFormatRepository.getByNationalBankCodes(new Set<String> { countryCode });
+        if (ibanFormats.size() == 0)
             throw new Iban.CountryCodeNotConfiguredException('Country code invalid or not configured');
 
+        Iban_Format__mdt ibanFormat = ibanFormats[0];
         if (ibanFormat.Characters__c != iban.length())
             return false;
 
         iban = iban.substring(4) + iban.substring(0, 4);
-        Long ibanAsLong = replaceLettersWithNumbers(iban);
-        return Math.mod(ibanAsLong, MAGIC_NUMBER) == 1; 
+        Integer ibanAsInt = convertToNumber(iban);
+        
+        return Math.mod(ibanAsInt, MAGIC_NUMBER) == 1; 
     }
 
-    private static Long replaceLettersWithNumbers(String iban) {
+    private static Integer convertToNumber(String iban) {
         final Integer diff = 55; // used specific for the iban calculation. The char diff between the hashcode and iban is 55.
         String temp = '';
         for (Integer i = 0; i < iban.length() - 1; i++){
             String character = iban.substring(i, i + 1);
             temp += character.isNumeric() ? String.valueOf(character.hashCode() - diff) : character;
         }   
-        return Long.valueOf(temp);
+        return Integer.valueOf(temp);
     }
 
     public class CountryCodeNotConfiguredException extends Exception {}
